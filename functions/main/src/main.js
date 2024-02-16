@@ -42,10 +42,14 @@ export default async ({ req, res, log, error }) => {
         // check for maintenance //
         if (!document.last_maintenance) {
           last_maintenance = document.buy_date
+        } else {
+          last_maintenance = document.last_maintenance
         }
+
         if (!document.maintenance_period) {
           if (!document.types.maintenance_period) {
             log('matenance not set')
+            return;
           } else {
             maintenance_period = document.types.maintenance_period
           }
