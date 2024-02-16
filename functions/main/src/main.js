@@ -18,9 +18,6 @@ export default async ({ req, res, log, error }) => {
       .setKey(process.env.APPWRITE_API_KEY);
     const databases = new Databases(client);
     let cursor = null;
-
-    let maintenance_period;
-    let last_maintenance;
     let process_logs = {};
 
     do {
@@ -37,6 +34,10 @@ export default async ({ req, res, log, error }) => {
       );
 
       for (let index = 0; index < documents.length; index++) {
+        // reset params 
+        let maintenance_period;
+        let last_maintenance;
+
         const document = documents[index];
 
         // check for maintenance //
@@ -46,10 +47,11 @@ export default async ({ req, res, log, error }) => {
           last_maintenance = document.last_maintenance
         }
 
+        log(`maintenance_period ${document.maintenance_period} ${index} ${document.asset_id}`)
         if (!document.maintenance_period) {
           if (!document.types.maintenance_period) {
-            log('matenance not set')
-            return;
+            log(`Maintenance not set, ${document
+              .asset_id}`)
           } else {
             maintenance_period = document.types.maintenance_period
           }
@@ -57,8 +59,10 @@ export default async ({ req, res, log, error }) => {
           maintenance_period = document.maintenance_period
         }
 
-        if (getDaysDifference(document.buy_date) - maintenance_period > 0) {
 
+        if (document.asset_status == "Available" && maintenance_period && getDaysDifference(document.buy_date) - maintenance_period > 0) {
+
+          log(`asset that need maintenance ${document.asset_id}`);
           // create event
           await databases.createDocument(
             process.env.APPWRITE_DATABASE_ID,
@@ -91,10 +95,11 @@ export default async ({ req, res, log, error }) => {
             {
               type: "schedule",
               requested_by: "System",
-              tenants: document.tenants.$id
+              tenants: document.tenants.$id,
+              asset_id: document.asset_id,
+              note: "event created by system schedule"
             }
           );
-
 
           // create process_logs
           if (!process_logs[document.tenants.$id]) {
