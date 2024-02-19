@@ -70,6 +70,7 @@ export default async ({ req, res, log, error }) => {
             ID.unique(),
             {
               asset_id: document.asset_id,
+              asset_id_ref: document.$id,
               location: document?.locations?.name,
               description: "Scheduling Maintenance",
               event_type: "MaintenanceRequired",
