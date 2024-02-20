@@ -98,6 +98,7 @@ export default async ({ req, res, log, error }) => {
               requested_by: "System",
               tenants: document.tenants.$id,
               asset_id: document.asset_id,
+              asset_id_ref: document.$id,
               note: "event created by system schedule"
             }
           );
