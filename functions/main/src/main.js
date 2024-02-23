@@ -60,7 +60,7 @@ export default async ({ req, res, log, error }) => {
         }
 
 
-        if (document.asset_status == "Available" && maintenance_period && getDaysDifference(document.buy_date) - maintenance_period > 0) {
+        if (document.asset_status == "Available" && maintenance_period && getDaysDifference(last_maintenance) - maintenance_period > 0) {
 
           log(`asset that need maintenance ${document.asset_id}`);
           // create event
